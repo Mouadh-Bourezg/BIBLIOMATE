@@ -47,8 +47,43 @@ class DocumentService {
     }
   }
 
+  // In DocumentService class
+  Future<List<Document>> fetchDocumentsBySearch(String query) async {
+    try {
+      final response = await client
+          .from('documents') // Access the documents table
+          .select('*') // Select all fields
+          .or('title.ilike.%$query%') // Search by title
+          .execute();
+
+      // Map the response to a list of Document
+      final List<dynamic> data = response.data;
+      return data.map((doc) => Document.fromMap(doc)).toList();
+    } catch (e) {
+      print('Error fetching documents: $e');
+      return []; // Return an empty list on error
+    }
+  }
+
+  Future<List<Document>> fetchDocumentsByUserId(String userId) async {
+    try {
+      final response = await client
+          .from('documents') // Access the documents table
+          .select('*') // Select all fields
+          .eq('uploader_id', userId) // Filter by uploader_id
+          .execute();
+
+      // Map the response to a list of Document
+      final List<dynamic> data = response.data;
+      return data.map((doc) => Document.fromMap(doc)).toList();
+    } catch (e) {
+      print('Error fetching documents by user ID: $e');
+      return []; // Return an empty list on error
+    }
+  }
+
   // Function to fetch a document by its ID
-  Future<Document> fetchDocumentById(String documentId) async {
+  Future<Document> fetchDocumentById(int documentId) async {
     try {
       final response = await client
           .from('documents')
@@ -60,7 +95,7 @@ class DocumentService {
       // Map the response to a Document object
       return Document.fromMap(response.data);
     } catch (e) {
-      print('Error fetching document: $e');
+      print('Error fetching document by id: $e');
       throw e; // Rethrow the error for further handling
     }
   }
@@ -78,18 +113,17 @@ class DocumentService {
     final pdfUrl = await uploadPdf(pdfFile);
 
     if (imageUrl != null && pdfUrl != null) {
-      final document = Document(
-        title: title,
-        description: description,
-        imageUrl: imageUrl,
-        pdfContentUrl: pdfUrl,
-        publishDate: DateTime.now(),
-        uploaderId: uploaderId,
-      );
-
       try {
         // Insert the document into the database
-        await client.from('documents').insert(document.toMap());
+        await client.from('documents').insert({
+
+          'title': title,
+          'description': description,
+          'image_url': imageUrl,
+          'pdf_content_url': pdfUrl,
+          'publish_date': DateTime.now().toIso8601String(),
+          'uploader_id': uploaderId!,
+        });
         print('Document inserted successfully.');
       } catch (e) {
         print('Error inserting document: $e');
@@ -111,6 +145,61 @@ class DocumentService {
     } catch (e) {
       print('Error fetching documents: $e');
       return [];
+    }
+  }
+  Future<String?> getPDFUrl(int documentId) async {
+    final response = await client
+        .from('documents')
+        .select('pdf_content_url')
+        .eq('id', documentId)
+        .single();
+
+    if (response != null && response['pdf_content_url'] != null) {
+      return response['pdf_content_url'];
+    }
+    return null;
+  }
+
+
+  Future<void> incrementLikes(int documentId) async {
+    try {
+      final response = await client
+          .from('documents')
+          .select('likes')
+          .eq('id', documentId)
+          .single(); // Fetch a single document
+
+      int currentLikes = response['likes'] ?? 0; // Handle null case
+
+      await client.from('documents').update({
+        'likes': currentLikes + 1
+      }).eq('id', documentId);
+
+      print('Likes incremented successfully.');
+    } catch (e) {
+      print('Error incrementing likes: $e');
+    }
+  }
+
+
+  // Decrement the likes count for a document
+  Future<void> decrementLikes(int documentId) async {
+    try {
+      final response = await client
+          .from('documents')
+          .select('likes')
+          .eq('id', documentId)
+          .single(); // Fetch a single document
+
+      int currentLikes = response['likes'] ?? 0; // Handle null case
+
+      await client.from('documents').update({
+        'likes': currentLikes - 1
+      }).eq('id', documentId);
+
+      print('Likes incremented successfully.');
+    } catch (e) {
+      print('Error incrementing likes: $e');
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'components/bottomBar.dart';
+import 'accountInfo.dart'; // Import the AccountInfoPage
 
 class ProfilePage extends StatelessWidget {
   @override
@@ -9,15 +10,9 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 20),
-            // Profile Image and Greeting
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150'), // Replace with actual image URL
-            ),
-            SizedBox(height: 10),
+            // Greeting
             Text(
-              'Hi, mouadh.bourezg',
+              'Profile', // Placeholder for the user's name
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
@@ -28,7 +23,12 @@ class ProfilePage extends StatelessWidget {
               title: Text('Account Information'),
               trailing: Icon(Icons.arrow_forward_ios),
               onTap: () {
-                // Handle navigation
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AccountInfoPage(), // Navigate to AccountInfoPage
+                  ),
+                );
               },
             ),
             Divider(thickness: 1),

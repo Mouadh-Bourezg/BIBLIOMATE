@@ -27,12 +27,23 @@ class SignUpPage extends StatelessWidget {
           throw Exception('Sign-Up Failed');
         }
 
-        // Sign-Up successful, navigate to HomePage
+        // Sign-Up successful, store additional user information in the users table
+        final user = response.user;
+
+        // Insert user details into the `users` table
+        final insertResponse = await Supabase.instance.client.from('users').insert([
+          {
+            'id': user?.id,  // Use the user ID from the authentication response
+            'first_name': firstnameController.text.trim(),
+            'last_name': lastnameController.text.trim(),
+            'email': emailController.text.trim(),
+          }
+        ]);
+
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Sign-Up Successful')),
         );
-
-        // Optionally, you can also store additional user information in your database here
 
         // Navigate back to the previous page or to the HomePage
         Navigator.of(context).pop({
@@ -47,6 +58,7 @@ class SignUpPage extends StatelessWidget {
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -193,8 +205,6 @@ class SignUpPage extends StatelessWidget {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Password cannot be empty';
-                    } else if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
                     }
                     return null;
                   },

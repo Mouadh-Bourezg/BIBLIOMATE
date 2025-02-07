@@ -6,6 +6,7 @@ import 'package:project/components/documentCardInList.dart'; // Import the new c
 import 'package:project/models/list.dart';
 import 'package:project/services/listServices.dart'; // Import ListService
 import 'package:supabase_flutter/supabase_flutter.dart'; // Import Supabase
+import './listContent.dart';
 
 class SavedPage extends StatefulWidget {
   const SavedPage({super.key});
@@ -97,15 +98,6 @@ class _SavedPageState extends State<SavedPage> {
     );
   }
 
-  //todo: void _navigateToListDetails(String listId) {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => ListDetailsPage(listId: listId),
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,13 +118,11 @@ class _SavedPageState extends State<SavedPage> {
           ),
           Column(
             children: userLists.map((list) {
-              return GestureDetector(
-                // todo: onTap: () => _navigateToListDetails(list.title),
-                child: ListCard(
+              return ListCard(
                   title: list.title,
-                  imageUrl: 'assets/glasses-1052010_640.jpg', // Replace with actual image URL
-                ),
-              );
+                id: list.id,
+                );
+
             }).toList(),
           ),
         ],

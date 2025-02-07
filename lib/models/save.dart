@@ -1,12 +1,12 @@
 class Save {
   final int? id;
   final int listId;
-  final int bookId;
+  final int documentId;
 
   Save({
     this.id,
     required this.listId,
-    required this.bookId,
+    required this.documentId,
   });
 
   // Convert a Save object into a Map
@@ -14,21 +14,21 @@ class Save {
     return {
       'id': id,
       'listId': listId,
-      'bookId': bookId,
+      'bookId': documentId,
     };
   }
 
   // Create a Save object from a Map
   factory Save.fromMap(Map<String, dynamic> map) {
     return Save(
-      id: map['id'],
-      listId: map['listId'],
-      bookId: map['bookId'],
+      id: map['id']?? null,
+      listId: map['list_id'],
+      documentId: map['document_id'],
     );
   }
 
   @override
   String toString() {
-    return 'Save{id: $id, listId: $listId, bookId: $bookId}';
+    return 'Save{id: $id, listId: $listId, bookId: $documentId}';
   }
 }

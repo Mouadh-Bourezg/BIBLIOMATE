@@ -40,6 +40,9 @@ dependencies:
   sqflite: ^2.2.0+3
   path: ^1.8.3
   supabase_flutter: ^1.5.0
+  webview_flutter: ^4.10.0
+  dio: ^5.4.0  # For downloading files
+  open_filex: ^4.3.2  # To open the downloaded file
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

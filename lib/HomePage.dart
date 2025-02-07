@@ -34,14 +34,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // void _navigateToDocumentPage(Document document) {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => DocumentPage2(document: document, currentIndex: _currentIndex),
-  //     ),
-  //   );
-  // }
+  void _navigateToDocumentPage(Document document) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DocumentPage2(document: document),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,12 +131,8 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: GestureDetector(
-        //onTap: () => _navigateToDocumentPage(document),
         child: DocumentCard(
-          title: document.title,
-          uploaderName: document.uploaderId!, // Assuming you have a way to get the uploader's name
-          imageUrl: document.imageUrl,
-          isPdf: true,
+          documentId: document.id,
         ),
       ),
     );

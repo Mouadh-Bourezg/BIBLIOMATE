@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:project/services/documentServices.dart'; // Import DocumentService
 import 'components/DocumentCard.dart';
 import 'components/bottomBar.dart';
 import 'styles.dart';
 import 'documentPage2.dart';
+import './models/document.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -12,72 +15,52 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   bool _showResults = false;
-  List<Map<String, String>> _searchResults = [];
+  List<Document> _searchResults = []; // Change to List<Document>
   int _currentIndex = 1;
 
-  final List<Map<String, String>> documents = [
-    {
-      "title": "Business Plan - Template: Professional",
-      "uploader": "Anes Abderrahim Chahira",
-      "description": "A comprehensive business plan template.",
-      "imageUrl": "assets/glasses-1052010_640.jpg", // Truncated for brevity
-    },
-    {
-      "title": "Market Analysis Report",
-      "uploader": "John Doe",
-      "description": "Detailed market analysis report.",
-      "imageUrl": "assets/glasses-1052010_640.jpg", // Truncated for brevity
-    },
-    {
-      "title": "Startup Guide",
-      "uploader": "Jane Smith",
-      "description": "A guide for startups.",
-      "imageUrl": "assets/glasses-1052010_640.jpg", // Truncated for brevity
-    },
-    // Add more documents as needed
-  ];
+  final DocumentService _documentService = DocumentService(Supabase.instance.client); // Initialize DocumentService
 
-  final List<Map<String, dynamic>> categories = [
-    {"title": "Business", "icon": Icons.business},
-    {"title": "Technology", "icon": Icons.computer},
-    {"title": "Self-Help", "icon": Icons.self_improvement},
-    {"title": "Education", "icon": Icons.school},
-    {"title": "Fiction", "icon": Icons.book},
-    {"title": "Non-Fiction", "icon": Icons.menu_book},
-    {"title": "Health & Fitness", "icon": Icons.fitness_center},
-    {"title": "Travel", "icon": Icons.travel_explore},
-    {"title": "Science", "icon": Icons.science},
-    {"title": "History", "icon": Icons.history_edu},
-  ];
+  void _onSearchChanged(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _showResults = false;
+        _searchResults = [];
+      });
+      return;
+    }
 
-  void _onSearchChanged(String query) {
     setState(() {
-      _showResults = query.isNotEmpty;
-      _searchResults = documents
-          .where((doc) =>
-      doc["title"]!.toLowerCase().contains(query.toLowerCase()) ||
-          doc["uploader"]!.toLowerCase().contains(query.toLowerCase()) ||
-          doc["description"]!.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      _showResults = true; // Show results when there is a query
     });
+
+    try {
+      // Fetch documents based on the search query
+      _searchResults = await _documentService.fetchDocumentsBySearch(query);
+      setState(() {}); // Update the UI with the search results
+    } catch (e) {
+      print('Error fetching documents: $e');
+      setState(() {
+        _searchResults = []; // Clear results on error
+      });
+    }
   }
 
   void _clearSearch() {
     setState(() {
       _searchController.clear();
       _showResults = false;
+      _searchResults = []; // Clear search results
     });
   }
 
-  //todo:  void _navigateToDocumentPage(Map<String, String> document) {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) =>
-  //           DocumentPage2(document: document, currentIndex: _currentIndex),
-  //     ),
-  //   );
-  // }
+  void _navigateToDocumentPage(Document document) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DocumentPage2(document: document),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,11 +83,11 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(width: 2, color: Colors.orange), // Focused border
+                  borderSide: BorderSide(width: 2, color: Colors.orange),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(width: 2, color: Colors.orange), // Focused border
+                  borderSide: BorderSide(width: 2, color: Colors.orange),
                 ),
                 prefixIcon: Icon(Icons.search, color: Colors.orange),
                 fillColor: Colors.white,
@@ -119,7 +102,7 @@ class _SearchPageState extends State<SearchPage> {
               cursorWidth: 0.7,
             ),
           ),
-          // Category List or Search Results
+          // Search Results
           Expanded(
             child: Container(
               color: Colors.white,
@@ -130,42 +113,15 @@ class _SearchPageState extends State<SearchPage> {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: GestureDetector(
-                      //todo: onTap: () => _navigateToDocumentPage(doc),
+                      onTap: () => _navigateToDocumentPage(doc), // Navigate to document page
                       child: DocumentCard(
-                        title: doc["title"]!,
-                        uploaderName: doc["uploader"]!,
-                        imageUrl: doc["imageUrl"]!,
-                        isPdf: true,
+                        documentId: doc.id,
                       ),
                     ),
                   );
                 }).toList(),
               )
-                  : ListView.builder(
-                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  final category = categories[index];
-                  return ListTile(
-                    leading: Icon(category['icon'], color: Colors.orange),
-                    title: Text(
-                      category['title'],
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    onTap: () {
-                      // Placeholder for action when a category is tapped
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Tapped on ${category['title']}"),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+                  : Center(child: Text('No results found.')),
             ),
           ),
         ],

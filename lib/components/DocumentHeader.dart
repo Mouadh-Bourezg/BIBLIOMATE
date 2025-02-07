@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
 import '../screens/pdf_reader_page.dart';
+import '../models/document.dart';
+import '../services/userServices.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DocumentHeader extends StatelessWidget {
-  final Map<String, String> document;
+  final Document document;
 
   DocumentHeader({required this.document});
+  final userService = UserService(Supabase.instance.client);
+
+  Future<String?> getUploaderName(String uploaderId) async {
+    try {
+      final userInfo = await userService.getUserInformation(uploaderId);
+      print('The uploader infos :' + userInfo.toString());
+      return userInfo['first_name']! + ' ' + userInfo['last_name']!;
+    } catch (e) {
+      return "Unknown"; // Handle errors gracefully
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,19 +26,39 @@ class DocumentHeader extends StatelessWidget {
       children: [
         Row(
           children: [
-            DocumentImage(imageUrl: document['imageUrl']!),
+            DocumentImage(imageUrl: document.imageUrl!),
             SizedBox(width: 16),
-            DocumentTitleAndUploader(
-              title: document['title']!,
-              uploaderName: document['uploader']!,
+            Expanded(
+              child: FutureBuilder<String?>(
+                future: getUploaderName(document.uploaderId!),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return DocumentTitleAndUploader(
+                      title: document.title!,
+                      uploaderName: "Loading...",
+                    );
+                  } else if (snapshot.hasError) {
+                    return DocumentTitleAndUploader(
+                      title: document.title!,
+                      uploaderName: "Error",
+                    );
+                  } else {
+                    return DocumentTitleAndUploader(
+                      title: document.title!,
+                      uploaderName: snapshot.data ?? "Unknown",
+                    );
+                  }
+                },
+              ),
             ),
           ],
         ),
-        ReadNowButton()
+        ReadNowButton(pdfUrl: document.pdfContentUrl)
       ],
     );
   }
 }
+
 
 class DocumentImage extends StatelessWidget {
   final String imageUrl;
@@ -93,12 +127,7 @@ class DocumentTitleAndUploader extends StatelessWidget {
           Row(
             children: [
               Text('Uploaded by :'),
-              SizedBox(width: 8),
-              CircleAvatar(
-                backgroundImage: AssetImage(
-                    'assets/glasses-1052010_640.jpg'), // Replace with actual image URL
-              ),
-              SizedBox(width: 8),
+              SizedBox(width: 3),
               Text(
                 uploaderName,
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -112,6 +141,8 @@ class DocumentTitleAndUploader extends StatelessWidget {
 }
 
 class ReadNowButton extends StatelessWidget {
+  final String pdfUrl;
+  ReadNowButton({required this.pdfUrl});
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -121,7 +152,7 @@ class ReadNowButton extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (context) => PdfReaderPage(
-                      pdfPath: "assets/demo.pdf",
+                      pdfPath: pdfUrl,
                     )),
           );
         },

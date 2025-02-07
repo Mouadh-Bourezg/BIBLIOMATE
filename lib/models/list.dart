@@ -1,5 +1,5 @@
 class ListModel {
-  final String id;
+  final int id;
   final String title;
   final String userId;
   final DateTime createdAt;
@@ -13,7 +13,7 @@ class ListModel {
     required this.updatedAt,
   });
 
-  // Convert Document to Map<String, String>
+  // Convert ListModel to Map<String, dynamic>
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -24,10 +24,10 @@ class ListModel {
     };
   }
 
-  // Create Document from Map
+  // Create ListModel from Map
   factory ListModel.fromMap(Map<String, dynamic> map) {
     return ListModel(
-      id: map['id'] as String,
+      id: map['id'] as int,
       title: map['title'] as String,
       userId: map['user_id'] as String,
       createdAt: DateTime.parse(map['created_at'] as String),

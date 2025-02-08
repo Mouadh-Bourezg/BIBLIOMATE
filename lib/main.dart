@@ -1,45 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import './HomePage.dart';
-import './savedPage.dart';
 import './SearchPage.dart';
 import './uploadDocument.dart';
 import './documentPage.dart';
 import './myProfilePage.dart';
 import './styles.dart';
 import './SignInPage.dart';
-import 'components/bottomBar.dart';
 import './services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dependency_injection.dart';
+import 'pages/First_page.dart';
 
-
-void main() {
+void main() async {  // Make main async
   WidgetsFlutterBinding.ensureInitialized();
-  SupabaseService.initialize();
+  await SupabaseService.initialize();
+  
+  // Recover session if it exists
+  final savedSession = await SupabaseService.restoreSession();
+  if (savedSession != null) {
+    await Supabase.instance.client.auth.recoverSession(savedSession);
+  }
+  
+  DependencyInjection.init();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: appTheme,
-      home: MainPage(),
+      home: SupabaseService.isSignedIn ? const MainPage() : const FirstPage(),
     );
   }
 }
 
-class
-
-MainPage extends StatefulWidget {
-
-  const MainPage({
-    super.key});
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
-class _MainPageState extends State<MainPage> {
 
+class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
@@ -51,22 +58,18 @@ class _MainPageState extends State<MainPage> {
   ];
 
   @override
-
   Widget build(BuildContext context) {
-
     final user = Supabase.instance.client.auth.currentUser;
 
     if (user == null) {
-      return
-        SignInPage();
+      return SignInPage();
     }
 
-    return
-      Scaffold(
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _pages,
-        ),
-      );
+    return Scaffold(
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
+      ),
+    );
   }
 }

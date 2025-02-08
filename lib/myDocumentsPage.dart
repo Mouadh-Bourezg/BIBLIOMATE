@@ -5,6 +5,8 @@ import 'package:project/components/documentCard.dart'; // Import DocumentCard
 import 'models/document.dart';
 
 class MyDocumentsPage extends StatefulWidget {
+  const MyDocumentsPage({super.key});
+
   @override
   _MyDocumentsPageState createState() => _MyDocumentsPageState();
 }
@@ -39,18 +41,18 @@ class _MyDocumentsPageState extends State<MyDocumentsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Documents'),
+        title: const Text('My Documents'),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.blueAccent,
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator()) // Show loading indicator while fetching
+          ? const Center(child: CircularProgressIndicator()) // Show loading indicator while fetching
           : _documents.isEmpty
-          ? Center(child: Text('No documents found.'))
+          ? const Center(child: Text('No documents found.'))
           : GridView.builder(
         padding: const EdgeInsets.all(16.0),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, // Two cards per row
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,

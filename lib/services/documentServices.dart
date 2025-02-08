@@ -13,7 +13,7 @@ class DocumentService {
       await client.storage.from('images').upload(
         'documents/${imageFile.uri.pathSegments.last}',
         imageFile,
-        fileOptions: FileOptions(contentType: 'image/jpeg'),
+        fileOptions: const FileOptions(contentType: 'image/jpeg'),
       );
 
       // Get the public URL of the uploaded image
@@ -33,7 +33,7 @@ class DocumentService {
       await client.storage.from('pdfs').upload(
         'documents/${pdfFile.uri.pathSegments.last}',
         pdfFile,
-        fileOptions: FileOptions(contentType: 'application/pdf'),
+        fileOptions: const FileOptions(contentType: 'application/pdf'),
       );
 
       // Get the public URL of the uploaded PDF
@@ -96,7 +96,7 @@ class DocumentService {
       return Document.fromMap(response.data);
     } catch (e) {
       print('Error fetching document by id: $e');
-      throw e; // Rethrow the error for further handling
+      rethrow; // Rethrow the error for further handling
     }
   }
 

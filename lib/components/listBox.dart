@@ -5,7 +5,7 @@ class DocumentCard extends StatelessWidget {
   final int numberoftitles;
   final String imageUrl;
 
-  DocumentCard({
+  const DocumentCard({super.key, 
     required this.title,
     required this.imageUrl,
     required this.numberoftitles,
@@ -22,12 +22,12 @@ class DocumentCard extends StatelessWidget {
     final cardWidth = screenWidth * 0.9;
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       width: cardWidth,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 4,
@@ -41,7 +41,7 @@ class DocumentCard extends StatelessWidget {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(10),
                   topRight: Radius.circular(10),
                 ),
@@ -54,7 +54,7 @@ class DocumentCard extends StatelessWidget {
                     return Container(
                       height: cardHeight * 0.6,
                       color: Colors.grey[300],
-                      child: Center(
+                      child: const Center(
                         child: Icon(
                           Icons.broken_image,
                           color: Colors.grey,
@@ -74,7 +74,7 @@ class DocumentCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -83,7 +83,7 @@ class DocumentCard extends StatelessWidget {
                 ),
                 Text(
                   "Titles ${numberoftitles.toString()}",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w100,
                     color: Colors.grey,
                     fontSize: 14,

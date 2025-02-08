@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 class ReviewContainer extends StatelessWidget {
+  const ReviewContainer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.orange.shade50,
         borderRadius: BorderRadius.circular(8),
@@ -14,9 +16,9 @@ class ReviewContainer extends StatelessWidget {
         children: [
           RatingsAndReviewsHeader(),
           ReviewHeader(),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           ReviewContent(),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           ReviewActions(),
         ],
       ),
@@ -25,9 +27,11 @@ class ReviewContainer extends StatelessWidget {
 }
 
 class RatingsAndReviewsHeader extends StatelessWidget {
+  const RatingsAndReviewsHeader({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text('Ratings & Reviews', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -38,15 +42,17 @@ class RatingsAndReviewsHeader extends StatelessWidget {
 }
 
 class ReviewHeader extends StatelessWidget {
+  const ReviewHeader({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        CircleAvatar(
+        const CircleAvatar(
           backgroundImage: NetworkImage('https://example.com/reviewer.jpg'), // Replace with actual URL
         ),
-        SizedBox(width: 8),
-        Expanded(
+        const SizedBox(width: 8),
+        const Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -56,7 +62,7 @@ class ReviewHeader extends StatelessWidget {
           ),
         ),
         Row(
-          children: List.generate(5, (index) => Icon(Icons.star, color: Colors.orange, size: 16)),
+          children: List.generate(5, (index) => const Icon(Icons.star, color: Colors.orange, size: 16)),
         ),
       ],
     );
@@ -64,9 +70,11 @@ class ReviewHeader extends StatelessWidget {
 }
 
 class ReviewContent extends StatelessWidget {
+  const ReviewContent({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -83,6 +91,8 @@ class ReviewContent extends StatelessWidget {
 }
 
 class ReviewActions extends StatelessWidget {
+  const ReviewActions({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -90,13 +100,13 @@ class ReviewActions extends StatelessWidget {
       children: [
         TextButton.icon(
           onPressed: () {},
-          icon: Icon(Icons.thumb_up, color: Colors.grey, size: 16),
-          label: Text('Like', style: TextStyle(fontSize: 12)),
+          icon: const Icon(Icons.thumb_up, color: Colors.grey, size: 16),
+          label: const Text('Like', style: TextStyle(fontSize: 12)),
         ),
         TextButton.icon(
           onPressed: () {},
-          icon: Icon(Icons.comment, color: Colors.grey, size: 16),
-          label: Text('Comment', style: TextStyle(fontSize: 12)),
+          icon: const Icon(Icons.comment, color: Colors.grey, size: 16),
+          label: const Text('Comment', style: TextStyle(fontSize: 12)),
         ),
       ],
     );

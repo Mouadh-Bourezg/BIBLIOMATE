@@ -3,35 +3,60 @@ import 'package:project/components/DocumentCard.dart';
 import 'package:project/components/bottomBar.dart';
 import 'package:project/documentPage2.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:project/services/documentServices.dart'; // Import DocumentService
-import 'package:project/models/document.dart'; // Import Document model
+import 'package:project/services/documentServices.dart';
+import 'package:project/models/document.dart';
+import 'package:project/components/Placeholder.dart';
 
 class HomePage extends StatefulWidget {
-  static final pageRoute = '/HomePage';
+  static const pageRoute = '/HomePage';
   final bool showBottomBar;
-
-  HomePage({this.showBottomBar = true});
+  const HomePage({Key? key, this.showBottomBar = true}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+// 1. Add SingleTickerProviderStateMixin for animation
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
-  final DocumentService _documentService = DocumentService(Supabase.instance.client);
-  List<Document> documents = []; // List to hold fetched documents
+  final DocumentService _documentService =
+      DocumentService(Supabase.instance.client);
+  List<Document> documents = [];
+  bool _isLoading = true;
+  late AnimationController _rotationController;
 
   @override
   void initState() {
     super.initState();
-    _fetchDocuments(); // Fetch documents when the page is initialized
+    // 2. Initialize and start the rotation animation
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat(); // repeats indefinitely
+    _fetchDocuments();
+  }
+
+  @override
+  void dispose() {
+    // Always dispose of the animation controller
+    _rotationController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchDocuments() async {
-    List<Document> fetchedDocuments = await _documentService.fetchAllDocuments();
-    setState(() {
-      documents = fetchedDocuments; // Update the state with fetched documents
-    });
+    try {
+      List<Document> fetchedDocuments =
+          await _documentService.fetchAllDocuments();
+      setState(() {
+        documents = fetchedDocuments;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _navigateToDocumentPage(Document document) {
@@ -45,95 +70,109 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: NotificationListener<ScrollNotification>(
-        onNotification: (scrollNotification) {
-          // Optionally handle scroll events here
-          return false;
-        },
+      // Ensure content is not hidden behind system UI elements like the camera notch
+      body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            // Fixed AppBar with title BIBLIOMATE
             SliverAppBar(
-              expandedHeight: 130.0,
-              floating: false,
               pinned: true,
-              flexibleSpace: LayoutBuilder(
-                builder: (context, constraints) {
-                  // Calculate the collapse progress
-                  double collapseProgress = (1.0 -
-                      (constraints.maxHeight - kToolbarHeight) /
-                          (130.0 - kToolbarHeight))
-                      .clamp(0.0, 1.0);
-
-                  return Stack(
-                    children: [
-                      // Logo (fades out as scrolling progresses)
-                      Opacity(
-                        opacity: (1.0 - collapseProgress).clamp(0.0, 1.0),
-                        child: Center(
-                          child: Image.asset(
-                            '../assets/logo.png',
-                            width: 120,
-                            height: 110,
-                          ),
-                        ),
-                      ),
-                      // App name (fades in as scrolling progresses)
-                      Opacity(
-                        opacity: collapseProgress,
-                        child: Center(
-                          child: Text(
-                            'BiblioMate',
-                            style: TextStyle(
-                              color: Colors.orange,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
+              elevation: 0,
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.transparent,
+              scrolledUnderElevation: 0,
+              centerTitle: true,
+              title: Text(
+                'BIBLIOMATE',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: screenWidth * 0.05,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-            // Main content
+            // "Explorer" heading with rotating icon
+            SliverToBoxAdapter(
+              child: Container(
+                color: Colors.white,
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04, // 4% of screen width
+                  vertical: screenHeight * 0.02, // 2% of screen height
+                ),
+                child: Row(
+                  children: [
+                    // 3. Wrap the icon in a RotationTransition
+                    RotationTransition(
+                      turns: _rotationController, // controls rotation
+                      child: Icon(
+                        Icons.explore,
+                        color: Colors.blue,
+                        size: screenWidth * 0.07, // 7% of screen width
+                      ),
+                    ),
+                    SizedBox(width: screenWidth * 0.02), // 2% of screen width
+                    Text(
+                      'Explorer',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.045, // 4.5% of screen width
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // The list of documents or placeholders
             SliverList(
               delegate: SliverChildBuilderDelegate(
-                    (context, index) {
+                (context, index) {
+                  if (_isLoading) {
+                    // Show placeholders
+                    if (index < 6) {
+                      return const DocumentCardPlaceholder();
+                    }
+                    return null; // no more items
+                  }
                   if (index < documents.length) {
                     return _buildDocumentRow(documents[index]);
-                  } else {
-                    return SizedBox(height: 16); // Placeholder for spacing
                   }
+                  return null;
                 },
-                childCount: documents.length,
+                childCount: _isLoading ? 6 : documents.length,
               ),
             ),
           ],
         ),
       ),
+      // Bottom Nav Bar
       bottomNavigationBar: widget.showBottomBar
           ? CustomBottomNavigationBar(
-        currentIndex: _currentIndex,
-        onItemSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      )
+              currentIndex: _currentIndex,
+              onItemSelected: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+            )
           : null,
     );
   }
 
   Widget _buildDocumentRow(Document document) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: EdgeInsets.only(
+          right:
+              MediaQuery.of(context).size.width * 0.02), // 2% of screen width
       child: GestureDetector(
-        child: DocumentCard(
-          documentId: document.id,
-        ),
+        onTap: () => _navigateToDocumentPage(document),
+        child: DocumentCard(documentId: document.id),
       ),
     );
   }

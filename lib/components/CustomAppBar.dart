@@ -4,7 +4,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize; // AppBar height
 
-  CustomAppBar() : preferredSize = Size.fromHeight(80.0);
+  CustomAppBar({super.key}) : preferredSize = const Size.fromHeight(80.0);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               onTap: () {
                 Navigator.pop(context); // Navigate back
               },
-              child: CircleAvatar(
+              child: const CircleAvatar(
                 backgroundColor: Colors.orange,
                 radius: 17,
                 child: Icon(
@@ -33,7 +33,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               onTap: () {
                 _showReportDialog(context);
               },
-              child: CircleAvatar(
+              child: const CircleAvatar(
                 backgroundColor: Colors.red,
                 radius: 17,
                 child: Icon(
@@ -53,14 +53,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Report"),
-          content: Text("Do you want to report some inappropriate content?"),
+          title: const Text("Report"),
+          content: const Text("Do you want to report some inappropriate content?"),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text(
+              child: const Text(
                 "Cancel",
                 style: TextStyle(color: Colors.grey),
               ),
@@ -70,10 +70,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 // Add your report logic here
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Reported successfully!')),
+                  const SnackBar(content: Text('Reported successfully!')),
                 );
               },
-              child: Text(
+              child: const Text(
                 "Report",
                 style: TextStyle(color: Colors.red),
               ),

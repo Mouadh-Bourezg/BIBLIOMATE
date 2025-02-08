@@ -1,138 +1,255 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../screens/pdf_reader_page.dart';
 import '../models/document.dart';
 import '../services/userServices.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DocumentHeader extends StatelessWidget {
   final Document document;
 
-  DocumentHeader({required this.document});
+  DocumentHeader({Key? key, required this.document}) : super(key: key);
+
   final userService = UserService(Supabase.instance.client);
 
   Future<String?> getUploaderName(String uploaderId) async {
     try {
       final userInfo = await userService.getUserInformation(uploaderId);
-      print('The uploader infos :' + userInfo.toString());
-      return userInfo['first_name']! + ' ' + userInfo['last_name']!;
+      return '${userInfo['first_name'] ?? ''} ${userInfo['last_name'] ?? ''}';
     } catch (e) {
-      return "Unknown"; // Handle errors gracefully
+      // Log or handle error
+      return "Unknown"; // fallback
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Card(
+      margin: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.04, // Increased from 5% to 6%
+        vertical: screenHeight * 0.01, // Increased from 2% to 2.4%
+      ),
+      elevation: 3.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+            screenWidth * 0.024), // Increased from 2% to 2.4%
+      ),
+      child: Padding(
+        padding:
+            EdgeInsets.all(screenWidth * 0.048), // Increased from 4% to 4.8%
+        child: Row(
           children: [
-            DocumentImage(imageUrl: document.imageUrl!),
-            SizedBox(width: 16),
+            // Document Image
+            DocumentImage(imageUrl: document.imageUrl),
+            SizedBox(width: screenWidth * 0.048), // Increased from 4% to 4.8%
+            // Title, Uploader Info, and "Read Now" Button in a column
             Expanded(
-              child: FutureBuilder<String?>(
-                future: getUploaderName(document.uploaderId!),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return DocumentTitleAndUploader(
-                      title: document.title!,
-                      uploaderName: "Loading...",
-                    );
-                  } else if (snapshot.hasError) {
-                    return DocumentTitleAndUploader(
-                      title: document.title!,
-                      uploaderName: "Error",
-                    );
-                  } else {
-                    return DocumentTitleAndUploader(
-                      title: document.title!,
-                      uploaderName: snapshot.data ?? "Unknown",
-                    );
-                  }
-                },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Text(
+                    document.title,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.06, // Increased from 5% to 6%
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(
+                      height:
+                          screenHeight * 0.012), // Increased from 1% to 1.2%
+                  // Uploader info (FutureBuilder)
+                  FutureBuilder<String?>(
+                    future: getUploaderName(document.uploaderId!),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        // Loading state
+                        return Row(
+                          children: [
+                            Text(
+                              'Uploaded by: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: screenWidth *
+                                    0.036, // Increased from 3% to 3.6%
+                              ),
+                            ),
+                            SizedBox(
+                                width: screenWidth *
+                                    0.012), // Increased from 1% to 1.2%
+                            SizedBox(
+                              width: screenWidth *
+                                  0.045, // Increased from 3.75% to 4.5%
+                              height: screenWidth *
+                                  0.045, // Increased from 3.75% to 4.5%
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          ],
+                        );
+                      } else if (snapshot.hasError) {
+                        // Error state
+                        return Row(
+                          children: [
+                            Text(
+                              'Uploaded by: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: screenWidth *
+                                    0.036, // Increased from 3% to 3.6%
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'Error loading uploader',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: screenWidth *
+                                      0.036, // Increased from 3% to 3.6%
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        // Success state
+                        final uploaderName = snapshot.data ?? "Unknown";
+                        return Row(
+                          children: [
+                            Text(
+                              'Uploaded by: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: screenWidth *
+                                    0.036, // Increased from 3% to 3.6%
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                uploaderName.trim().isEmpty
+                                    ? "Unknown"
+                                    : uploaderName,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: screenWidth *
+                                      0.036, // Increased from 3% to 3.6%
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                  SizedBox(
+                      height:
+                          screenHeight * 0.024), // Increased from 2% to 2.4%
+                  // Align the button to the right
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ReadNowButton(pdfUrl: document.pdfContentUrl),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        ReadNowButton(pdfUrl: document.pdfContentUrl)
-      ],
+      ),
     );
   }
 }
-
 
 class DocumentImage extends StatelessWidget {
   final String imageUrl;
 
-  DocumentImage({required this.imageUrl});
+  const DocumentImage({Key? key, required this.imageUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 100,
-      height: 120,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-            8), // Ensure clipping matches the container's radius
-        child: Stack(
-          children: [
-            Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              width: 100,
-              height: 120,
-            ),
-            Positioned(
-              bottom: 5,
-              right: 5,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  color: Colors.orange,
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                child: Text(
-                  'PDF',
-                  style: TextStyle(color: Colors.white, fontSize: 10),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
 
-class DocumentTitleAndUploader extends StatelessWidget {
-  final String title;
-  final String uploaderName;
-
-  DocumentTitleAndUploader({required this.title, required this.uploaderName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(
+          screenWidth * 0.024), // Increased from 2% to 2.4%
+      child: Stack(
         children: [
-          Text(
-            title,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          // Document cover image
+          Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            width: screenWidth * 0.24, // Increased from 20% to 24%
+            height: screenWidth * 0.36, // Increased from 30% to 36%
+            errorBuilder: (context, error, stackTrace) {
+              // Fallback if image fails to load
+              return Container(
+                width: screenWidth * 0.24, // Increased from 20% to 24%
+                height: screenWidth * 0.36, // Increased from 30% to 36%
+                color: Colors.grey.shade300,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: screenWidth * 0.096, // Increased from 8% to 9.6%
+                      color: Colors.grey.shade600,
+                    ),
+                    SizedBox(height: screenWidth * 0.012),
+                    Text(
+                      'Image\nNot Found',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.032,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                width: screenWidth * 0.24, // Increased from 20% to 24%
+                height: screenWidth * 0.36, // Increased from 30% to 36%
+                alignment: Alignment.center,
+                color: Colors.grey.shade200,
+                child: SizedBox(
+                  width: screenWidth * 0.06, // Increased from 5% to 6%
+                  height: screenWidth * 0.06, // Increased from 5% to 6%
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              );
+            },
           ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Text('Uploaded by :'),
-              SizedBox(width: 3),
-              Text(
-                uploaderName,
-                style: TextStyle(fontWeight: FontWeight.bold),
+          // "PDF" label
+          Positioned(
+            bottom: screenWidth * 0.012, // Increased from 1% to 1.2%
+            right: screenWidth * 0.012, // Increased from 1% to 1.2%
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(
+                    screenWidth * 0.012), // Increased from 1% to 1.2%
               ),
-            ],
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.024, // Increased from 2% to 2.4%
+                vertical: screenWidth * 0.006, // Increased from 0.5% to 0.6%
+              ),
+              child: Text(
+                'PDF',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: screenWidth * 0.036, // Increased from 3% to 3.6%
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -142,31 +259,41 @@ class DocumentTitleAndUploader extends StatelessWidget {
 
 class ReadNowButton extends StatelessWidget {
   final String pdfUrl;
-  ReadNowButton({required this.pdfUrl});
+
+  const ReadNowButton({Key? key, required this.pdfUrl}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => PdfReaderPage(
-                      pdfPath: pdfUrl,
-                    )),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.orange,
-          backgroundColor: Colors.orange,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return ElevatedButton(
+      onPressed: pdfUrl.isNotEmpty
+          ? () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PdfReaderPage(pdfPath: pdfUrl),
+                ),
+              );
+            }
+          : null, // disable the button if pdfUrl is empty
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.072, // Increased from 6% to 7.2%
+          vertical: screenWidth * 0.024, // Increased from 2% to 2.4%
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 12),
-          child: Text('Read Now', style: TextStyle(color: Colors.white)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+              screenWidth * 0.024), // Increased from 2% to 2.4%
         ),
+      ),
+      child: Text(
+        'Read Now',
+        style: TextStyle(
+            fontSize: screenWidth * 0.042), // Increased from 3.5% to 4.2%
       ),
     );
   }

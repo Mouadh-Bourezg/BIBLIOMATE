@@ -15,10 +15,9 @@ class SaveService {
           .eq('list_id', listId)
           .eq('document_id', documentId)
           .execute();
-
     } catch (e) {
       print('Error deleting save: $e');
-      throw e; // Rethrow the error for further handling
+      rethrow; // Rethrow the error for further handling
     }
   }
 
@@ -35,7 +34,7 @@ class SaveService {
       return data.map((item) => Save.fromMap(item)).toList();
     } catch (e) {
       print('Error fetching saves: $e');
-      throw e; // Rethrow the error for further handling
+      rethrow; // Rethrow the error for further handling
     }
   }
 
@@ -47,10 +46,11 @@ class SaveService {
         'document_id': documentId, // Set the current timestamp
       }).execute();
 
-      print('Save inserted successfully for document $documentId in list $listId');
+      print(
+          'Save inserted successfully for document $documentId in list $listId');
     } catch (e) {
       print('Error inserting save: $e');
-      throw e; // Rethrow the error for further handling
+      rethrow; // Rethrow the error for further handling
     }
   }
 }

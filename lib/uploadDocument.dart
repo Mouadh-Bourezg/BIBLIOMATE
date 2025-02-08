@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'components/bottomBar.dart';
-import 'styles.dart';
+
 import 'services/documentServices.dart'; // Import the DocumentService
 import 'package:supabase_flutter/supabase_flutter.dart'; // Import Supabase
 import 'dart:io';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class uploadDocumentPage extends StatefulWidget {
+  const uploadDocumentPage({super.key});
+
   @override
   _uploadDocumentPageState createState() => _uploadDocumentPageState();
 }
@@ -32,9 +33,9 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
   ];
 
   // Define the new color palette
-  final Color _backgroundColor = Color(0xFFF5F7FA); // #f5f7fa
-  final Color _primaryColor = Color(0xFF207BFF); // #207bff
-  final Color _accentColor = Color(0xFF4EA5FF); // #4ea5ff
+  final Color _backgroundColor = const Color(0xFFF5F7FA); // #f5f7fa
+  final Color _primaryColor = const Color(0xFF207BFF); // #207bff
+  final Color _accentColor = const Color(0xFF4EA5FF); // #4ea5ff
 
   // Initialize DocumentService
   late final DocumentService _documentService;
@@ -62,7 +63,7 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("No image selected."),
         ),
       );
@@ -86,7 +87,7 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("No PDF selected."),
         ),
       );
@@ -97,7 +98,7 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
     if (_formKey.currentState!.validate()) {
       if (_uploadedPdfFile == null || _uploadedImageFile == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text("Please upload both an image and a PDF document."),
           ),
         );
@@ -111,7 +112,8 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
           description: _descriptionController.text.trim(),
           imageFile: _uploadedImageFile!,
           pdfFile: _uploadedPdfFile!,
-          uploaderId: Supabase.instance.client.auth.currentUser?.id, // Replace with the actual user ID
+          uploaderId: Supabase.instance.client.auth.currentUser
+              ?.id, // Replace with the actual user ID
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -140,33 +142,65 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: _backgroundColor,
+      appBar: PreferredSize(
+        preferredSize:
+            Size.fromHeight(screenHeight * 0.10), // 10% of screen height
+        child: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.blue,
+          automaticallyImplyLeading: false,
+          flexibleSpace: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: EdgeInsets.all(screenWidth * 0.02),
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: Colors.blue,
+                        size: screenWidth * 0.05,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'UPLOAD DOCUMENT',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.05,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.08),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(0),
         child: Column(
           children: [
-            // Header
-            Container(
-              height: MediaQuery.of(context).size.height * 0.15,
-              decoration: BoxDecoration(
-                color: _primaryColor,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  "Upload Document",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
@@ -189,10 +223,9 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                             labelText: "Add Document Title",
                             hintText: "Enter document title",
                             border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.grey),
-                            labelStyle: TextStyle(color: Colors.grey),
-                            floatingLabelStyle:
-                            TextStyle(color: _primaryColor),
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            labelStyle: const TextStyle(color: Colors.grey),
+                            floatingLabelStyle: TextStyle(color: _primaryColor),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -203,7 +236,7 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
                     // Category Dropdown
                     Card(
@@ -217,19 +250,18 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                           GestureDetector(
                             onTap: () {
                               setState(() {
-                                _isCategoryExpanded =
-                                !_isCategoryExpanded;
+                                _isCategoryExpanded = !_isCategoryExpanded;
                               });
                             },
                             child: Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 16),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     _selectedCategory ?? 'Select Category',
@@ -250,12 +282,12 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                             ),
                           ),
                           AnimatedContainer(
-                            duration: Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 500),
                             height: _isCategoryExpanded
                                 ? _categories.length * 50.0
                                 : 0,
                             child: Container(
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.only(
                                   bottomLeft: Radius.circular(12),
@@ -263,20 +295,20 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                                 ),
                               ),
                               child: ListView(
-                                physics: NeverScrollableScrollPhysics(),
-                                padding: EdgeInsets.all(0),
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: const EdgeInsets.all(0),
                                 children: _categories
                                     .map((category) => RadioListTile(
-                                  title: Text(category),
-                                  value: category,
-                                  groupValue: _selectedCategory,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedCategory = value;
-                                      _isCategoryExpanded = false;
-                                    });
-                                  },
-                                ))
+                                          title: Text(category),
+                                          value: category,
+                                          groupValue: _selectedCategory,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedCategory = value;
+                                              _isCategoryExpanded = false;
+                                            });
+                                          },
+                                        ))
                                     .toList(),
                               ),
                             ),
@@ -284,7 +316,7 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                         ],
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
                     // Description Field
                     Card(
@@ -301,10 +333,9 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                             labelText: "Add Description",
                             hintText: "Enter description",
                             border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.grey),
-                            labelStyle: TextStyle(color: Colors.grey),
-                            floatingLabelStyle:
-                            TextStyle(color: _primaryColor),
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            labelStyle: const TextStyle(color: Colors.grey),
+                            floatingLabelStyle: TextStyle(color: _primaryColor),
                           ),
                           maxLines: 3,
                           validator: (value) {
@@ -316,21 +347,20 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
                     // Image Upload Button
                     GestureDetector(
-                      onTapDown: (_) =>
-                          setState(() => _isUploadPressed = true),
+                      onTapDown: (_) => setState(() => _isUploadPressed = true),
                       onTapUp: (_) {
                         setState(() => _isUploadPressed = false);
                         _pickImageFile();
                       },
                       child: AnimatedScale(
                         scale: _isUploadPressed ? 0.95 : 1.0,
-                        duration: Duration(milliseconds: 100),
+                        duration: const Duration(milliseconds: 100),
                         child: ElevatedButton.icon(
-                          icon: Icon(Icons.upload_file),
+                          icon: const Icon(Icons.upload_file),
                           label: Text(
                             _uploadedImageFile == null
                                 ? "Upload Image"
@@ -340,7 +370,7 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _accentColor,
                             foregroundColor: Colors.white,
-                            minimumSize: Size(double.infinity, 50),
+                            minimumSize: const Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -349,21 +379,20 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
                     // PDF Upload Button
                     GestureDetector(
-                      onTapDown: (_) =>
-                          setState(() => _isUploadPressed = true),
+                      onTapDown: (_) => setState(() => _isUploadPressed = true),
                       onTapUp: (_) {
                         setState(() => _isUploadPressed = false);
                         _pickPdfFile();
                       },
                       child: AnimatedScale(
                         scale: _isUploadPressed ? 0.95 : 1.0,
-                        duration: Duration(milliseconds: 100),
+                        duration: const Duration(milliseconds: 100),
                         child: ElevatedButton.icon(
-                          icon: Icon(Icons.upload_file),
+                          icon: const Icon(Icons.upload_file),
                           label: Text(
                             _uploadedPdfFile == null
                                 ? "Upload PDF"
@@ -373,7 +402,7 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _accentColor,
                             foregroundColor: Colors.white,
-                            minimumSize: Size(double.infinity, 50),
+                            minimumSize: const Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -382,26 +411,25 @@ class _uploadDocumentPageState extends State<uploadDocumentPage>
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
                     // Submit Button
                     GestureDetector(
-                      onTapDown: (_) =>
-                          setState(() => _isSubmitPressed = true),
+                      onTapDown: (_) => setState(() => _isSubmitPressed = true),
                       onTapUp: (_) {
                         setState(() => _isSubmitPressed = false);
                         _submitForm();
                       },
                       child: AnimatedScale(
                         scale: _isSubmitPressed ? 0.95 : 1.0,
-                        duration: Duration(milliseconds: 100),
+                        duration: const Duration(milliseconds: 100),
                         child: ElevatedButton.icon(
-                          icon: Icon(Icons.send),
-                          label: Text("SUBMIT"),
+                          icon: const Icon(Icons.send),
+                          label: const Text("SUBMIT"),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _primaryColor,
                             foregroundColor: Colors.white,
-                            minimumSize: Size(double.infinity, 50),
+                            minimumSize: const Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),

@@ -51,4 +51,44 @@ class ListService {
       throw e; // Rethrow the error for further handling
     }
   }
+
+  // Add this new method inside ListService class
+  Future<void> editList(String listId, String newTitle) async {
+    final userId = client.auth.currentUser?.id;
+
+    if (userId == null) {
+      throw Exception('User is not authenticated');
+    }
+
+    try {
+      await client.from('lists').update({
+        'title': newTitle,
+        'updated_at': DateTime.now().toIso8601String(),
+      }).match({
+        'id': listId,
+        'user_id': userId, // Ensure user owns the list
+      }).execute();
+    } catch (e) {
+      print('Error updating list: $e');
+      throw e;
+    }
+  }
+
+  Future<void> deleteList(String listId) async {
+    final userId = client.auth.currentUser?.id;
+
+    if (userId == null) {
+      throw Exception('User is not authenticated');
+    }
+
+    try {
+      await client.from('lists').delete().match({
+        'id': listId,
+        'user_id': userId, // Ensure user owns the list
+      }).execute();
+    } catch (e) {
+      print('Error deleting list: $e');
+      throw e;
+    }
+  }
 }

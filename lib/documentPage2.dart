@@ -7,16 +7,14 @@ import 'package:project/models/document.dart'; // Import Document model
 import 'components/DocumentHeader.dart';
 import 'components/DocumentActions.dart';
 import 'components/DocumentDescription.dart';
-import 'components/CustomAppBar.dart';
 import 'components/bottomBar.dart';
 import 'components/CommentsSection.dart'; // Import CommentsSection
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DocumentPage2 extends StatefulWidget {
-  static final pageRoute = '/DocumentPage';
+  static const pageRoute = '/DocumentPage';
   final Document document; // Accept the document instance
-
-  DocumentPage2({required this.document});
+  const DocumentPage2({super.key, required this.document});
 
   @override
   _DocumentPage2State createState() => _DocumentPage2State();
@@ -35,7 +33,8 @@ class _DocumentPage2State extends State<DocumentPage2> {
 
   Future<void> _fetchUserLists() async {
     try {
-      userLists = await _listService.fetchUserLists(); // Fetch lists from the service
+      userLists =
+          await _listService.fetchUserLists(); // Fetch lists from the service
       setState(() {});
     } catch (e) {
       print('Error fetching user lists: $e');
@@ -47,28 +46,52 @@ class _DocumentPage2State extends State<DocumentPage2> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add to List'),
-          content: Container(
+          title: Text(
+            'Add to List',
+            style:
+                TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05),
+          ),
+          content: SizedBox(
             width: double.minPositive,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: userLists.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(userLists[index].title),
+                  title: Text(
+                    userLists[index].title,
+                    style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width * 0.04),
+                  ),
                   onTap: () async {
                     // Get the current user ID
-                    final userId = Supabase.instance.client.auth.currentUser?.id;
+                    final userId =
+                        Supabase.instance.client.auth.currentUser?.id;
                     if (userId != null) {
                       // Create a save instance
-                      await _saveService.insertSave(userLists[index].id, widget.document.id);
+                      await _saveService.insertSave(
+                          userLists[index].id, widget.document.id);
                       Navigator.of(context).pop(); // Close the dialog
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Document added to ${userLists[index].title}')),
+                        SnackBar(
+                          content: Text(
+                            'Document added to ${userLists[index].title}',
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.035),
+                          ),
+                        ),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('User not authenticated')),
+                        SnackBar(
+                          content: Text(
+                            'User not authenticated',
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.035),
+                          ),
+                        ),
                       );
                     }
                   },
@@ -81,7 +104,11 @@ class _DocumentPage2State extends State<DocumentPage2> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                    fontSize: MediaQuery.of(context).size.width * 0.04),
+              ),
             ),
           ],
         );
@@ -91,21 +118,85 @@ class _DocumentPage2State extends State<DocumentPage2> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: PreferredSize(
+        preferredSize:
+            Size.fromHeight(screenHeight * 0.10), // 10% of screen height
+        child: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.blue,
+          automaticallyImplyLeading: false, // Disable default back button
+          flexibleSpace: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04), // 4% of screen width
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment:
+                    CrossAxisAlignment.center, // Vertically center align
+                children: [
+                  // Back Arrow Button
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: EdgeInsets.all(
+                          screenWidth * 0.02), // 2% of screen width
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: Colors.blue,
+                        size: screenWidth * 0.05, // 5% of screen width
+                      ),
+                    ),
+                  ),
+                  // Title
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'DOCUMENT DETAILS',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.05, // 5% of screen width
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  // Empty space to balance the layout
+                  SizedBox(width: screenWidth * 0.08), // 8% of screen width
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(screenWidth * 0.04), // 4% of screen width
         children: [
           DocumentHeader(document: widget.document),
-          SizedBox(height: 16),
+          SizedBox(height: screenHeight * 0.02), // 2% of screen height
           DocumentActions(
             onAddToList: () => _showAddToListDialog(context),
             documentId: widget.document.id,
           ),
-          Divider(height: 32, thickness: 1, color: Colors.black26),
+          Divider(
+            height: screenHeight * 0.04, // 4% of screen height
+            thickness: screenHeight * 0.002, // 0.2% of screen height
+            color: Colors.black26,
+          ),
           DocumentDescription(description: widget.document.description),
-          SizedBox(height: 16),
-          CommentsSection(documentId: widget.document.id), // Added CommentsSection
+          SizedBox(height: screenHeight * 0.02), // 2% of screen height
+          CommentsSection(
+            documentId: widget.document.id, // Added CommentsSection
+          ),
         ],
       ),
       bottomNavigationBar: CustomBottomNavigationBar(

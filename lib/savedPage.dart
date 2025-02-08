@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:project/components/DocumentCard.dart';
 import 'package:project/components/ListCard.dart';
 import 'package:project/components/bottomBar.dart';
 import 'package:project/components/documentCardInList.dart'; // Import the new component
 import 'package:project/models/list.dart';
 import 'package:project/services/listServices.dart'; // Import ListService
 import 'package:supabase_flutter/supabase_flutter.dart'; // Import Supabase
-import './listContent.dart';
 
 class SavedPage extends StatefulWidget {
   const SavedPage({super.key});
@@ -18,7 +16,7 @@ class SavedPage extends StatefulWidget {
 class _SavedPageState extends State<SavedPage> {
   final ListService _listService = ListService(Supabase.instance.client);
   List<ListModel> userLists = []; // Store the user's lists
-  String? listName; // Store the input list name.
+  String? listName; // Store the input list name
 
   @override
   void initState() {
@@ -28,21 +26,26 @@ class _SavedPageState extends State<SavedPage> {
 
   Future<void> _fetchUserLists() async {
     try {
-      userLists = await _listService.fetchUserLists(); // Fetch lists from the service
+      userLists =
+          await _listService.fetchUserLists(); // Fetch lists from the service
       setState(() {});
     } catch (e) {
-      print('Error fetching user lists: $e');
+      debugPrint('Error fetching user lists: $e');
     }
   }
 
+  /// Shows a dialog to create a new list (UI Only)
   void _showCreateListDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Create a New List'),
+          title: const Text(
+            'Create a New List',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           content: TextField(
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Enter list name',
               border: OutlineInputBorder(),
             ),
@@ -58,39 +61,55 @@ class _SavedPageState extends State<SavedPage> {
                 foregroundColor: Colors.red, // Text color
               ),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog.
+                Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange, // Button color
-                foregroundColor: Colors.white, // Text color
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               onPressed: () async {
-                // Perform list creation logic
-                if (listName != null && listName!.trim().isNotEmpty) {
-                  try {
-                    await _listService.createList(listName!.trim());
-                    print('List created: $listName'); // Replace with your logic.
-                    listName = null;
-                    Navigator.of(context).pop(); // Close the dialog.
-                    await _fetchUserLists(); // Refresh the list of user lists
-                  } catch (e) {
+                if (listName == null || listName!.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter a list name'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                try {
+                  await _listService.createList(listName!.trim());
+                  Navigator.of(context).pop();
+                  // Refresh the lists
+                  await _fetchUserLists();
+                  // Show success message
+                  if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error creating list: $e')),
+                      const SnackBar(
+                        content: Text('List created successfully'),
+                        backgroundColor: Colors.green,
+                      ),
                     );
                   }
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Please enter a valid list name.')),
-                  );
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error creating list: ${e.toString()}'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
               },
-              child: Text('Create List'),
+              child: const Text('Create List'),
             ),
           ],
         );
@@ -100,38 +119,262 @@ class _SavedPageState extends State<SavedPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      body: ListView(
-        padding: EdgeInsets.all(8.0),
-        children: [
-          SizedBox(height: 20),
-          GestureDetector(
-            onTap: _showCreateListDialog,
-            child: ListTile(
-              leading: Icon(Icons.add_circle_outline),
-              title: Text('Create a List'),
+      // ===================== APP BAR ======================
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(screenHeight * 0.10),
+        child: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.blue,
+          automaticallyImplyLeading: false,
+          flexibleSpace: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // ===== Back Button =====
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: EdgeInsets.all(screenWidth * 0.02),
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: Colors.blue,
+                        size: screenWidth * 0.06,
+                      ),
+                    ),
+                  ),
+                  // ===== Title in the Middle =====
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'SAVED LISTS',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.05,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.08),
+                ],
+              ),
             ),
           ),
-          Divider(
-            color: Colors.grey,
-            thickness: 1,
-          ),
-          Column(
-            children: userLists.map((list) {
-              return ListCard(
-                  title: list.title,
-                id: list.id,
-                );
-
-            }).toList(),
-          ),
-        ],
+        ),
       ),
+      // ===================== BODY ======================
+      body: Padding(
+        padding: EdgeInsets.all(screenWidth * 0.04),
+        child: userLists.isEmpty
+            // If NO LISTS
+            ? Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // ===== Placeholder Image =====
+                      Image.asset(
+                        'assets/no_list.jpg', // <-- Update with your image path
+                        width: screenWidth * 0.6,
+                      ),
+                      SizedBox(height: screenHeight * 0.03),
+                      // ===== No List Text =====
+                      Text(
+                        "Oops! There's no list created yet.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.045,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.02),
+                      // ===== Suggestion Text =====
+                      Text(
+                        "Tap the + button below to create one.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.04,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            // If THERE ARE LISTS
+            : ListView.separated(
+                itemCount: userLists.length,
+                separatorBuilder: (context, index) => SizedBox(
+                  height: screenHeight * 0.01,
+                ),
+                itemBuilder: (context, index) {
+                  final list = userLists[index];
+                  return ListCard(
+                    title: list.title,
+                    id: list.id.toString(),
+                    onDelete: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text(
+                            'Confirm Delete',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          content: Text(
+                            'Are you sure you want to delete "${list.title}"?',
+                          ),
+                          actions: [
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.grey,
+                              ),
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Cancel'),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () async {
+                                try {
+                                  await _listService
+                                      .deleteList(list.id.toString());
+                                  Navigator.pop(ctx);
+                                  await _fetchUserLists(); // Refresh the lists
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('List deleted successfully'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Error deleting list: ${e.toString()}'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    onEdit: () {
+                      String newListName =
+                          list.title; // Initialize with current name
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text(
+                            'Edit List Name',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          content: TextField(
+                            decoration: const InputDecoration(
+                              hintText: 'Enter new list name',
+                              border: OutlineInputBorder(),
+                            ),
+                            controller: TextEditingController(text: list.title),
+                            onChanged: (value) {
+                              newListName = value;
+                            },
+                          ),
+                          actions: [
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.red,
+                              ),
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Cancel'),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () async {
+                                if (newListName.trim().isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Please enter a list name'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                try {
+                                  await _listService.editList(
+                                    list.id.toString(),
+                                    newListName.trim(),
+                                  );
+                                  Navigator.pop(ctx);
+                                  await _fetchUserLists(); // Refresh the lists
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('List updated successfully'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Error updating list: ${e.toString()}'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              child: const Text('Save'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+      ),
+      // ===================== FLOATING ACTION BUTTON ======================
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showCreateListDialog,
+        backgroundColor: Colors.blue,
+        child: const Icon(Icons.add),
+      ),
+      // ===================== BOTTOM NAVIGATION BAR ======================
       bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 3, // Update index for saved page
+        currentIndex: 3, // Saved page index
         onItemSelected: (index) {
           setState(() {
-            // Handle navigation
+            // Handle navigation if needed
           });
         },
       ),
@@ -139,23 +382,22 @@ class _SavedPageState extends State<SavedPage> {
   }
 }
 
+// ===================== LIST DETAILS PAGE ======================
 class ListDetailsPage extends StatelessWidget {
   final String listName;
-
-  const ListDetailsPage({required this.listName});
+  const ListDetailsPage({super.key, required this.listName});
 
   @override
   Widget build(BuildContext context) {
     // Fetch documents for the specific list
     // This part will depend on how you store and retrieve documents for each list
     final documents = []; // Replace with actual fetching logic
-
     return Scaffold(
       appBar: AppBar(
         title: Text(listName),
       ),
       body: ListView(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         children: documents.map((document) {
           return DocumentCardInList(
             title: document['title'] ?? 'Unknown Title',

@@ -36,7 +36,7 @@ class infoDocument extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             height: screenHeight * 0.3,
             color: Colors.blue,
             child: Row(
@@ -49,21 +49,21 @@ class infoDocument extends StatelessWidget {
                 SizedBox(width: screenWidth * 0.1),
                 Column(
                   children: [
-                    Text(
+                    const Text(
                       'Title of the document',
                       style: TextStyle(
                         fontSize: 23,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       'Uploaded by:',
                       style: TextStyle(fontSize: 20),
                     ),
                     SizedBox(height: screenHeight * 0.05),
                     Container(
-                      child: Row(
+                      child: const Row(
                         children: [],
                       ),
                     )

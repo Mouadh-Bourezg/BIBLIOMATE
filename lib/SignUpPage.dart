@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart'; // Import Supabase
 
 class SignUpPage extends StatefulWidget {
   static const pageRoute = '/SignUp';
-  SignUpPage({Key? key}) : super(key: key);
+  const SignUpPage({super.key});
 
   @override
   _SignUpPageState createState() => _SignUpPageState();
@@ -17,7 +17,6 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
-
   bool _isLoading = false; // Loading state
 
   // Password validation regex
@@ -30,7 +29,6 @@ class _SignUpPageState extends State<SignUpPage> {
       setState(() {
         _isLoading = true; // Start loading
       });
-
       try {
         // Check if email is valid
         if (!RegExp(
@@ -38,25 +36,20 @@ class _SignUpPageState extends State<SignUpPage> {
             .hasMatch(emailController.text.trim())) {
           throw Exception('Invalid email format.');
         }
-
         // Check if password meets requirements
         if (!passwordRegex.hasMatch(passwordController.text.trim())) {
           throw Exception(
               'Password must be at least 8 characters long and contain uppercase, lowercase, and numbers.');
         }
-
         // Attempt to sign up the user
         final response = await Supabase.instance.client.auth.signUp(
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
-
         if (response.user == null) {
           throw Exception('Sign-Up Failed. Please try again.');
         }
-
         final user = response.user;
-
         // Insert user details into the `users` table
         await Supabase.instance.client.from('users').insert([
           {
@@ -66,11 +59,9 @@ class _SignUpPageState extends State<SignUpPage> {
             'email': emailController.text.trim(),
           }
         ]);
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Sign-Up Successful')),
         );
-
         // Return to previous screen (possibly the Login page) with email/password
         Navigator.of(context).pop({
           "email": emailController.text,
@@ -90,99 +81,111 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Dynamic padding based on screen width
+    final horizontalPadding = screenWidth * 0.05; // 5% of screen width
+    final verticalPadding = screenHeight * 0.02; // 2% of screen height
+
     // Primary color (match to your brand or the login screen)
     const Color primaryColor = Color(0xFF2979FF);
 
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
+                SizedBox(height: verticalPadding),
+                // Back Button with Circle
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: CircleAvatar(
-                        radius: 30,
+                        radius: screenWidth * 0.06, // 6% of screen width
                         backgroundColor: Colors.grey[200],
                         child: Icon(
                           Icons.arrow_back,
                           color: Colors.black,
-                          size: 30,
+                          size: screenWidth * 0.05, // 5% of screen width
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: verticalPadding),
                 // Circle avatar / user icon
                 CircleAvatar(
-                  radius: 60,
+                  radius: screenWidth * 0.15, // 15% of screen width
                   backgroundColor: Colors.grey[200],
                   child: Image.asset(
                     'assets/digital-library.png', // Replace with your own asset
-                    width: 80,
-                    height: 80,
+                    width: screenWidth * 0.12, // 12% of screen width
+                    height: screenWidth * 0.12, // 12% of screen width
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: verticalPadding * 2),
                 // Title
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Sign Up',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: screenWidth * 0.08, // 8% of screen width
                       fontWeight: FontWeight.bold,
                       color: Colors.grey[900],
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: verticalPadding / 2),
                 // Subtitle
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Create your account to continue',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: screenWidth * 0.035, // 3.5% of screen width
                       color: Colors.grey[700],
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: verticalPadding * 2),
                 // Email label
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Email',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: screenWidth * 0.04, // 4% of screen width
                       fontWeight: FontWeight.w900,
                       color: Colors.grey[800],
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: verticalPadding / 2),
                 // Email text field
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: 'Enter your email',
-                    prefixIcon: const Icon(Icons.email),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 22,
-                      horizontal: 22,
+                    prefixIcon: Icon(Icons.email,
+                        size: screenWidth * 0.05), // 5% of screen width
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02, // 2% of screen height
+                      horizontal: screenWidth * 0.05, // 5% of screen width
                     ),
                     filled: true,
                     fillColor: Colors.grey[200],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(
+                          screenWidth * 0.2), // 2% of screen width
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -193,34 +196,36 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: verticalPadding),
                 // First Name label
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'First Name',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: screenWidth * 0.04, // 4% of screen width
                       fontWeight: FontWeight.w900,
                       color: Colors.grey[800],
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: verticalPadding / 2),
                 // First Name text field
                 TextFormField(
                   controller: firstnameController,
                   decoration: InputDecoration(
                     hintText: 'Enter your first name',
-                    prefixIcon: const Icon(Icons.person),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 22,
-                      horizontal: 22,
+                    prefixIcon: Icon(Icons.person,
+                        size: screenWidth * 0.05), // 5% of screen width
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02, // 2% of screen height
+                      horizontal: screenWidth * 0.05, // 5% of screen width
                     ),
                     filled: true,
                     fillColor: Colors.grey[200],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(
+                          screenWidth * 0.2), // 2% of screen width
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -231,34 +236,36 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: verticalPadding),
                 // Last Name label
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Last Name',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: screenWidth * 0.04, // 4% of screen width
                       fontWeight: FontWeight.w900,
                       color: Colors.grey[800],
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: verticalPadding / 2),
                 // Last Name text field
                 TextFormField(
                   controller: lastnameController,
                   decoration: InputDecoration(
                     hintText: 'Enter your last name',
-                    prefixIcon: const Icon(Icons.person),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 22,
-                      horizontal: 22,
+                    prefixIcon: Icon(Icons.person,
+                        size: screenWidth * 0.05), // 5% of screen width
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02, // 2% of screen height
+                      horizontal: screenWidth * 0.05, // 5% of screen width
                     ),
                     filled: true,
                     fillColor: Colors.grey[200],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(
+                          screenWidth * 0.2), // 2% of screen width
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -269,35 +276,37 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: verticalPadding),
                 // Password label
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Password',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: screenWidth * 0.04, // 4% of screen width
                       fontWeight: FontWeight.w900,
                       color: Colors.grey[800],
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: verticalPadding / 2),
                 // Password text field
                 TextFormField(
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     hintText: 'Enter a secure password',
-                    prefixIcon: const Icon(Icons.lock),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 22,
-                      horizontal: 22,
+                    prefixIcon: Icon(Icons.lock,
+                        size: screenWidth * 0.05), // 5% of screen width
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02, // 2% of screen height
+                      horizontal: screenWidth * 0.05, // 5% of screen width
                     ),
                     filled: true,
                     fillColor: Colors.grey[200],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(
+                          screenWidth * 0.2), // 2% of screen width
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -311,35 +320,37 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: verticalPadding),
                 // Confirm Password label
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Confirm Password',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: screenWidth * 0.04, // 4% of screen width
                       fontWeight: FontWeight.w900,
                       color: Colors.grey[800],
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: verticalPadding / 2),
                 // Confirm Password text field
                 TextFormField(
                   controller: confirmPasswordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     hintText: 'Re-enter your password',
-                    prefixIcon: const Icon(Icons.lock),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 22,
-                      horizontal: 22,
+                    prefixIcon: Icon(Icons.lock,
+                        size: screenWidth * 0.05), // 5% of screen width
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02, // 2% of screen height
+                      horizontal: screenWidth * 0.05, // 5% of screen width
                     ),
                     filled: true,
                     fillColor: Colors.grey[200],
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(
+                          screenWidth * 0.2), // 2% of screen width
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -353,43 +364,46 @@ class _SignUpPageState extends State<SignUpPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: verticalPadding * 2),
                 // Sign Up Button with Loading Spinner
                 SizedBox(
                   width: double.infinity,
-                  height: 70,
+                  height: screenHeight * 0.08, // 8% of screen height
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(
+                            screenWidth * 0.2), // 2% of screen width
                       ),
                     ),
                     onPressed: _isLoading ? null : () => _signUp(context),
                     child: _isLoading
                         ? CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
                           )
-                        : const Text(
+                        : Text(
                             'Sign Up',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 16,
+                              fontSize:
+                                  screenWidth * 0.04, // 4% of screen width
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: verticalPadding * 2),
                 // Already have an account?
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'Already have an account? ',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04, // 4% of screen width
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -398,7 +412,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: Text(
                         'Login',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: screenWidth * 0.04, // 4% of screen width
                           fontWeight: FontWeight.bold,
                           color: primaryColor,
                         ),
@@ -406,7 +420,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: verticalPadding * 2),
               ],
             ),
           ),

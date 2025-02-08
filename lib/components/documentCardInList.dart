@@ -8,7 +8,7 @@ class DocumentCardInList extends StatelessWidget {
   final bool isPdf;
   final String status; // readNow, continueReading, finished
 
-  DocumentCardInList({
+  const DocumentCardInList({super.key, 
     required this.title,
     required this.uploaderName,
     required this.description,
@@ -28,12 +28,12 @@ class DocumentCardInList extends StatelessWidget {
     final cardWidth = screenWidth * 0.9;
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       width: cardWidth,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 6,
@@ -47,7 +47,7 @@ class DocumentCardInList extends StatelessWidget {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
                 ),
@@ -60,7 +60,7 @@ class DocumentCardInList extends StatelessWidget {
                     return Container(
                       height: cardHeight * 0.5,
                       color: Colors.grey[300],
-                      child: Center(
+                      child: const Center(
                         child: Icon(
                           Icons.broken_image,
                           color: Colors.grey,
@@ -80,8 +80,8 @@ class DocumentCardInList extends StatelessWidget {
                       color: Colors.red,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    child: Text(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    child: const Text(
                       'PDF',
                       style: TextStyle(
                         color: Colors.white,
@@ -100,14 +100,14 @@ class DocumentCardInList extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Text(
                   'Uploaded by: $uploaderName',
                   style: TextStyle(
@@ -117,7 +117,7 @@ class DocumentCardInList extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   description,
                   style: TextStyle(
@@ -127,7 +127,7 @@ class DocumentCardInList extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
@@ -136,7 +136,7 @@ class DocumentCardInList extends StatelessWidget {
                         : status == 'continueReading'
                             ? Colors.orange
                             : Colors.red,
-                    minimumSize: Size(double.infinity, 36),
+                    minimumSize: const Size(double.infinity, 36),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -147,7 +147,7 @@ class DocumentCardInList extends StatelessWidget {
                         : status == 'continueReading'
                             ? 'Continue Reading'
                             : 'Read Now',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                       color: Colors.white,

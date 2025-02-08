@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/like.dart'; // Import the Like model
+// Import the Like model
 
 class LikesService {
   final SupabaseClient client;

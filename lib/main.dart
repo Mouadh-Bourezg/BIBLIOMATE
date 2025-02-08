@@ -23,7 +23,7 @@ void main() async {  // Make main async
   }
   
   DependencyInjection.init();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -47,13 +47,13 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
 
   final List<Widget> _pages = [
     HomePage(),
     SearchPage(),
     uploadDocumentPage(),
-    documentPage(),
+    const documentPage(),
     ProfilePage(),
   ];
 

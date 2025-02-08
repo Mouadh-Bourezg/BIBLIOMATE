@@ -5,8 +5,8 @@ import './HomePage.dart';
 import './services/supabase_service.dart';
 
 class SignInPage extends StatefulWidget {
-  static final pageRoute = '/SignIn';
-  SignInPage({super.key});
+  static const pageRoute = '/SignIn';
+  const SignInPage({super.key});
 
   @override
   _SignInPageState createState() => _SignInPageState();
@@ -19,7 +19,7 @@ class _SignInPageState extends State<SignInPage> {
   bool _isLoading = false; // Loading state for sign-in button
   bool _obscurePassword = true;
 
-  Future _signIn(BuildContext context) async {
+  Future<void> _signIn(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true; // Start loading
@@ -30,17 +30,15 @@ class _SignInPageState extends State<SignInPage> {
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
-
         // Save the session
         if (response.session != null) {
           await SupabaseService.persistSession(
               response.session!.persistSessionString);
         }
-
         // Navigate to the main page after successful sign-in
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            transitionDuration: Duration(milliseconds: 500),
+            transitionDuration: const Duration(milliseconds: 500),
             pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -74,16 +72,26 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Dynamic padding based on screen width
+    final horizontalPadding = screenWidth * 0.05; // 5% of screen width
+    final verticalPadding = screenHeight * 0.02; // 2% of screen height
+
+    // Common styling
     const Color primaryColor = Color(0xFF2979FF); // Customize as needed
 
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
+                SizedBox(height: verticalPadding),
                 // Back Button with Circle
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -92,86 +100,82 @@ class _SignInPageState extends State<SignInPage> {
                       onTap: () =>
                           Navigator.pop(context), // Go back when tapped
                       child: CircleAvatar(
-                        radius: 30,
+                        radius: screenWidth * 0.06, // 6% of screen width
                         backgroundColor: Colors.grey[200],
                         child: Icon(
                           Icons.arrow_back,
                           color: Colors.black,
-                          size: 30,
+                          size: screenWidth * 0.05, // 5% of screen width
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-
+                SizedBox(height: verticalPadding),
                 // Circle avatar / user icon
                 CircleAvatar(
-                  radius: 60,
+                  radius: screenWidth * 0.15, // 15% of screen width
                   backgroundColor: Colors.grey[200],
                   child: Image.asset(
                     'assets/digital-library.png', // Replace with your own asset
-                    width: 80,
-                    height: 80,
+                    width: screenWidth * 0.12, // 12% of screen width
+                    height: screenWidth * 0.12, // 12% of screen width
                   ),
                 ),
-                const SizedBox(height: 24),
-
+                SizedBox(height: verticalPadding * 2),
                 // Title
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Login',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: screenWidth * 0.08, // 8% of screen width
                       fontWeight: FontWeight.bold,
                       color: Colors.grey[900],
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
-
+                SizedBox(height: verticalPadding / 2),
                 // Subtitle
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Login to continue using the app',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: screenWidth * 0.035, // 3.5% of screen width
                       color: Colors.grey[700],
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
-
+                SizedBox(height: verticalPadding * 2),
                 // Email label
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Email',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: screenWidth * 0.04, // 4% of screen width
                       fontWeight: FontWeight.w900,
                       color: Colors.grey[800],
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
-
+                SizedBox(height: verticalPadding / 2),
                 // Email text field
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: 'Enter your email',
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 22,
-                      horizontal: 22,
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02, // 2% of screen height
+                      horizontal: screenWidth * 0.05, // 5% of screen width
                     ),
                     fillColor: Colors.grey[200],
                     filled: true,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(
+                          screenWidth * 0.2), // 2% of screen width
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -185,22 +189,20 @@ class _SignInPageState extends State<SignInPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
-
+                SizedBox(height: verticalPadding),
                 // Password label
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Password',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: screenWidth * 0.04, // 4% of screen width
                       fontWeight: FontWeight.w900,
                       color: Colors.grey[800],
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
-
+                SizedBox(height: verticalPadding / 2),
                 // Password text field with toggle
                 TextFormField(
                   controller: passwordController,
@@ -219,14 +221,15 @@ class _SignInPageState extends State<SignInPage> {
                         });
                       },
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 22,
-                      horizontal: 22,
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02, // 2% of screen height
+                      horizontal: screenWidth * 0.05, // 5% of screen width
                     ),
                     fillColor: Colors.grey[200],
                     filled: true,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(
+                          screenWidth * 0.2), // 2% of screen width
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -239,53 +242,53 @@ class _SignInPageState extends State<SignInPage> {
                     return null;
                   },
                 ),
-
-                // Forgot Password?
-
-                const SizedBox(height: 32),
-
+                SizedBox(height: verticalPadding * 2),
                 // Login button
                 SizedBox(
                   width: double.infinity,
-                  height: 70,
+                  height: screenHeight * 0.08, // 8% of screen height
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(
+                            screenWidth * 0.2), // 2% of screen width
                       ),
                     ),
                     onPressed: _isLoading ? null : () => _signIn(context),
                     child: _isLoading
-                        ? const CircularProgressIndicator(
+                        ? CircularProgressIndicator(
                             color: Colors.white,
                           )
-                        : const Text(
+                        : Text(
                             'Login',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 16,
+                              fontSize:
+                                  screenWidth * 0.04, // 4% of screen width
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                   ),
                 ),
-                const SizedBox(height: 32),
-
+                SizedBox(height: verticalPadding * 2),
                 // Footer: Register link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       "Don't have an account? ",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04, // 4% of screen width
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     GestureDetector(
                       onTap: () async {
                         final result = await Navigator.of(context).push(
                           PageRouteBuilder(
-                            transitionDuration: Duration(milliseconds: 500),
+                            transitionDuration:
+                                const Duration(milliseconds: 500),
                             pageBuilder:
                                 (context, animation, secondaryAnimation) =>
                                     SignUpPage(),
@@ -304,7 +307,7 @@ class _SignInPageState extends State<SignInPage> {
                       child: Text(
                         'Register',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: screenWidth * 0.04, // 4% of screen width
                           fontWeight: FontWeight.bold,
                           color: primaryColor,
                         ),
@@ -312,7 +315,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: verticalPadding * 2),
               ],
             ),
           ),

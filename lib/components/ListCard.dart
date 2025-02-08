@@ -3,14 +3,26 @@ import '../listContent.dart';
 
 class ListCard extends StatelessWidget {
   final String title;
-  final int id;
-  ListCard({required this.title, required this.id});
+  final String id;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-  void _navigateToListDetails(int listId,BuildContext context) {
+  const ListCard({
+    Key? key,
+    required this.title,
+    required this.id,
+    required this.onEdit,
+    required this.onDelete,
+  }) : super(key: key);
+
+  void _navigateToListDetails(String listId, BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DocumentListPage(listId: listId),
+        builder: (context) => DocumentListPage(
+          listId: int.parse(listId), // Using the passed listId parameter
+          listName: this.title, // Using the title from the class properties
+        ),
       ),
     );
   }
@@ -18,29 +30,38 @@ class ListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent, // Ensures tap is detected
+      color: Colors.transparent,
       child: InkWell(
         onTap: () => _navigateToListDetails(id, context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            Divider(
-              thickness: 1,
-              color: Colors.grey[300],
-            ),
-          ],
+              IconButton(
+                icon: const Icon(Icons.edit),
+                color: Colors.green,
+                onPressed: onEdit,
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                color: Colors.red,
+                onPressed: onDelete,
+              ),
+            ],
+          ),
         ),
       ),
     );

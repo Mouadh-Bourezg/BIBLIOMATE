@@ -3,34 +3,39 @@ import 'package:project/SignUpPage.dart';
 import '../SignInPage.dart';
 
 class FirstPage extends StatelessWidget {
-  const FirstPage({Key? key}) : super(key: key);
+  const FirstPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     // Common styling
     const Color primaryColor = Color(0xFF2979FF); // Example blue color
-    const double horizontalPadding = 24.0;
+
+    // Dynamic padding based on screen width
+    final horizontalPadding = screenWidth * 0.05; // 5% of screen width
+    final verticalPadding = screenHeight * 0.02; // 2% of screen height
+
     return Scaffold(
-      // Make content safe from top/bottom phone cutouts
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: horizontalPadding),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 16),
-
+                SizedBox(height: verticalPadding),
                 // Top illustration (replace with your own asset if you have one)
-                SizedBox(
-                  height: 400,
-                  width: double.infinity,
+                AspectRatio(
+                  aspectRatio: 10 / 9, // Responsive aspect ratio
                   child: Image.asset(
                     'assets/library_illustration1.jpg',
                     fit: BoxFit.contain,
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: verticalPadding),
                 // Logo + title
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -38,63 +43,67 @@ class FirstPage extends StatelessWidget {
                     // Example logo icon – replace with your own if desired
                     CircleAvatar(
                       backgroundColor: primaryColor,
-                      radius: 18,
-                      child: const Icon(
+                      radius: screenWidth * 0.05, // 5% of screen width
+                      child: Icon(
                         Icons.book,
                         color: Colors.white,
-                        size: 20,
+                        size: screenWidth * 0.04, // 4% of screen width
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: screenWidth * 0.02), // 2% of screen width
                     Text(
                       'BIBLIOMATE',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: screenWidth * 0.05, // 5% of screen width
                         color: Colors.grey[800],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: verticalPadding),
                 // Headline
                 Text(
                   'Everything you need is in one place',
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: screenWidth * 0.06, // 6% of screen width
                     fontWeight: FontWeight.bold,
                     color: Colors.grey[900],
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: verticalPadding / 2),
                 // Subtitle / Description
                 Text(
                   'Find your daily necessities at Brand. The world\'s largest fashion e-commerce has arrived in a mobile. Shop now!',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: screenWidth * 0.035, // 3.5% of screen width
                     color: Colors.grey[700],
                     height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: verticalPadding * 2),
                 // Login button
                 SizedBox(
                   width: double.infinity,
-                  height: 70,
+                  height: screenHeight * 0.08, // 8% of screen height
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(
+                            screenWidth * 0.2), // 2% of screen width
                       ),
                     ),
                     onPressed: () {
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          transitionDuration: Duration(milliseconds: 500),
-                          pageBuilder: (context, animation, secondaryAnimation) => SignInPage(),
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          transitionDuration: const Duration(milliseconds: 500),
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  SignInPage(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
                             return FadeTransition(
                               opacity: animation,
                               child: child,
@@ -103,36 +112,40 @@ class FirstPage extends StatelessWidget {
                         ),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       'SignIn',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: screenWidth * 0.04, // 4% of screen width
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: verticalPadding),
                 // Register button
                 SizedBox(
                   width: double.infinity,
-                  height: 70,
+                  height: screenHeight * 0.08, // 8% of screen height
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       foregroundColor: primaryColor,
                       side: BorderSide(color: primaryColor, width: 2),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(
+                            screenWidth * 0.2), // 2% of screen width
                       ),
                     ),
                     onPressed: () {
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          transitionDuration: Duration(milliseconds: 500),
-                          pageBuilder: (context, animation, secondaryAnimation) => SignUpPage(),
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          transitionDuration: const Duration(milliseconds: 500),
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  SignUpPage(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
                             return FadeTransition(
                               opacity: animation,
                               child: child,
@@ -141,16 +154,16 @@ class FirstPage extends StatelessWidget {
                         ),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       'SignUp',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: screenWidth * 0.04, // 4% of screen width
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: verticalPadding * 2),
               ],
             ),
           ),

@@ -26,7 +26,7 @@ class UserService {
       };
     } catch (e) {
       print('Error fetching user information: $e');
-      throw e; // Rethrow the error for further handling
+      rethrow; // Rethrow the error for further handling
     }
   }
 }

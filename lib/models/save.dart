@@ -21,7 +21,7 @@ class Save {
   // Create a Save object from a Map
   factory Save.fromMap(Map<String, dynamic> map) {
     return Save(
-      id: map['id']?? null,
+      id: map['id'],
       listId: map['list_id'],
       documentId: map['document_id'],
     );

@@ -10,7 +10,7 @@ class DocumentActions extends StatefulWidget {
   final VoidCallback onAddToList;
   final int documentId;
 
-  DocumentActions({required this.onAddToList, required this.documentId});
+  const DocumentActions({super.key, required this.onAddToList, required this.documentId});
 
   @override
   _DocumentActionsState createState() => _DocumentActionsState();
@@ -101,12 +101,12 @@ class _DocumentActionsState extends State<DocumentActions> {
       children: [
         IconButton(
           icon: _isDownloading
-              ? CircularProgressIndicator() // Show loading if downloading
-              : Icon(Icons.download),
+              ? const CircularProgressIndicator() // Show loading if downloading
+              : const Icon(Icons.download),
           onPressed: _downloadPDF,
         ),
         IconButton(
-          icon: Icon(Icons.playlist_add),
+          icon: const Icon(Icons.playlist_add),
           onPressed: widget.onAddToList,
         ),
         Row(

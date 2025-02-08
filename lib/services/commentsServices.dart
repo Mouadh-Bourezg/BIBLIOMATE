@@ -6,7 +6,8 @@ class CommentsService {
   CommentsService(this.client);
 
   // Fetch comments for a specific document
-  Future<List<Map<String, dynamic>>> getCommentsForDocument(int documentId) async {
+  Future<List<Map<String, dynamic>>> getCommentsForDocument(
+      int documentId) async {
     try {
       final response = await client
           .from('comments')
@@ -32,10 +33,41 @@ class CommentsService {
         'document_id': documentId,
         'user_id': userId,
         'content': content,
-        'time': DateTime.now().toUtc().toIso8601String(), // Ensure timestamp is stored in UTC
+        'time': DateTime.now().toUtc().toIso8601String(), // store UTC timestamp
       }).execute();
     } catch (e) {
       print('Error adding comment: $e');
+    }
+  }
+
+  // Update an existing comment by its ID
+  Future<bool> updateComment(int commentId, String newContent) async {
+    if (newContent.trim().isEmpty) return false;
+
+    try {
+      final response = await client
+          .from('comments')
+          .update({'content': newContent})
+          .eq('id', commentId)
+          .execute();
+
+      return response.status == 200;
+    } catch (e) {
+      print('Error updating comment: $e');
+      return false;
+    }
+  }
+
+  // Delete a comment by its ID
+  Future<bool> deleteComment(int commentId) async {
+    try {
+      final response =
+          await client.from('comments').delete().eq('id', commentId).execute();
+
+      return response.status == 200;
+    } catch (e) {
+      print('Error deleting comment: $e');
+      return false;
     }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class DocumentTags extends StatelessWidget {
+  const DocumentTags({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Wrap(
@@ -17,14 +19,14 @@ class DocumentTags extends StatelessWidget {
 class DocumentTag extends StatelessWidget {
   final String label;
 
-  DocumentTag({required this.label});
+  const DocumentTag({super.key, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Chip(
       backgroundColor: Colors.grey,
       label: Text(label,
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.white
       ),),
     );

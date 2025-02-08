@@ -9,7 +9,7 @@ class SupabaseService {
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdscW1jYnRhdGRjcW50c2RiYm56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYzMzQ3NjIsImV4cCI6MjA1MTkxMDc2Mn0.-rgbe9tz3FioPEGMsF33gk1Z8Bs7VU_djzjXpsdtFHw";
 
   // Secure storage instance
-  static final _storage = const FlutterSecureStorage();
+  static const _storage = FlutterSecureStorage();
 
   // Initialize Supabase
   static Future<void> initialize() async {
@@ -36,8 +36,9 @@ class SupabaseService {
   // Persist the session securely
   static Future<void> persistSession(String sessionString) async {
     try {
-      if (sessionString.isEmpty)
+      if (sessionString.isEmpty) {
         throw ArgumentError('Session string cannot be empty');
+      }
       await _storage.write(
         key: 'session',
         value: sessionString,
@@ -97,8 +98,9 @@ class SecureLocalStorage implements LocalStorage {
   Future<void> Function(String sessionString) get persistSession =>
       (String sessionString) async {
         try {
-          if (sessionString.isEmpty)
+          if (sessionString.isEmpty) {
             throw ArgumentError('Session string cannot be empty');
+          }
           await _storage.write(
             key: 'session',
             value: sessionString,
